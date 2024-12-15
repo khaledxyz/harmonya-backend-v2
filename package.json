@@ -1,0 +1,26 @@
+{
+  "name": "harmonya-backend-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env DOTENV_CONFIG_PATH=./env.development tsx watch ./src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "cross-env": "^7.0.3",
+    "tsx": "^3.12.1",
+    "typescript": "^5.7.2"
+  }
+}
