@@ -1,23 +1,45 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+import chalk from "chalk";
+import { morganMiddleware } from "./middlewares/morgan.middleware";
+import { i18n } from "./middlewares/i18n.middleware";
+import { router } from "./routes";
+import { setupSwagger } from "./utils/swagger";
 
-// Load environment variables
-dotenv.config();
-
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 const app = express();
 
-// Middleware for parsing JSON
+// Middlewares setup
 app.use(express.json());
+app.use(morganMiddleware);
+app.use(i18n);
 
-// Basic route
-app.get("/", (req, res) => {
-  res.send("Hello, World! Welcome to your Express server.");
-});
+// Setup Swagger for API documentation
+setupSwagger(app);
 
-// Port from environment or default to 3000
+// Register routes
+app.use("/", router);
+
+// Server configuration
 const PORT = process.env.PORT || 3000;
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`
+  ${chalk.green("Harmonya API v2 is running 🚀")}
+  - Local:        ${chalk.blue(`http://localhost:${PORT}`)}
+  - Environment:  ${chalk.blue(process.env.NODE_ENV || "development")}
+  - Docs:         ${chalk.blue(`http://localhost:${PORT}/docs`)}
+  `);
 });
+
+// Graceful shutdown
+const shutdown = () => {
+  console.log(chalk.yellow("\nShutting down gracefully..."));
+  server.close(() => {
+    console.log(chalk.green("Server closed. Goodbye!"));
+    process.exit(0);
+  });
+};
+
+// Handle termination signals
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
