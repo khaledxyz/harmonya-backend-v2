@@ -15,8 +15,221 @@ datasource db {
 
 // THIS IS JUST AN EXAMPLE!
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  // id        Int      @id @default(autoincrement())
+  email     String  @id
+  firstName String?
+  lastName  String?
+  //TODO: Add Profile Pic
+
+  createdAt    DateTime       @default(now())
+  Admin        Admin[]
+  Client       Client[]
+  Owner        Owner[]
+  Manager      Manager[]
+  Notification Notification[]
+}
+
+model Admin {
+  userEmail String @id
+  user      User   @relation(fields: [userEmail], references: [email])
+}
+
+model Client {
+  userEmail String     @id
+  user      User       @relation(fields: [userEmail], references: [email])
+  address   String
+  phone     String
+  birthdate DateTime
+  Bookmark  Bookmark[]
+  Booking   Booking[]
+}
+
+model Owner {
+  userEmail    String         @id
+  user         User           @relation(fields: [userEmail], references: [email])
+  franchise    String         @unique
+  Manager      Manager[]
+  Subscription Subscription[]
+  Store        Store[]
+}
+
+model Manager {
+  userEmail  String  @id
+  user       User    @relation(fields: [userEmail], references: [email])
+  ownerEmail String
+  owner      Owner   @relation(fields: [ownerEmail], references: [userEmail])
+  Store      Store[]
+}
+
+model Subscription {
+  id         String           @id @default(uuid())
+  type       SubscriptionType
+  start      DateTime
+  end        DateTime
+  paid       Boolean
+  price      Float
+  ownerEmail String
+  owner      Owner            @relation(fields: [ownerEmail], references: [userEmail])
+}
+
+model Store {
+  id              String     @id @default(uuid())
+  name            String
+  address         String
+  ownerEmail      String
+  owner           Owner      @relation(fields: [ownerEmail], references: [userEmail])
+  managerEmail    String
+  manager         Manager    @relation(fields: [managerEmail], references: [userEmail])
+  Bookmark        Bookmark[]
+  services        Service[]
+  Booking         Booking[]
+  displayAgendaId String     @unique
+  displayAgenda   Agenda     @relation("displayAgenda", fields: [displayAgendaId], references: [id])
+  baseAgendaId    String     @unique
+  baseAgenda      Agenda     @relation("baseAgenda", fields: [baseAgendaId], references: [id])
+  Employee        Employee[]
+  Boost           Boost[]
+  Pub             Pub[]
+}
+
+model Bookmark {
+  id          String   @id @default(uuid())
+  url         String
+  storeId     String?
+  store       Store?   @relation(fields: [storeId], references: [id])
+  createdAt   DateTime
+  serviceId   String?
+  service     Service? @relation(fields: [serviceId], references: [id])
+  clientEmail String
+  client      Client   @relation(fields: [clientEmail], references: [userEmail])
+}
+
+model Service {
+  id            String          @id @default(uuid())
+  price         Float
+  duration      Int
+  title         String
+  description   String
+  color         String
+  stores        Store[]
+  //TODO: Add ImageCollection
+  collectionId  String
+  images        ImageCollection @relation(fields: [collectionId], references: [id])
+  Bookmark      Bookmark[]
+  subcategories SubCategory[]
+  Booking       Booking[]
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  title       String
+  SubCategory SubCategory[]
+}
+
+model SubCategory {
+  id         String    @id @default(uuid())
+  title      String
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  serviceId  String?
+  services   Service[]
+}
+
+model Image {
+  url          String          @id
+  collectionId String
+  collection   ImageCollection @relation(fields: [collectionId], references: [id])
+  mobilePub    Pub?            @relation("mobileImage")
+  desktopPub   Pub?            @relation("desktopImage")
+}
+
+model ImageCollection {
+  id      String    @id @default(uuid())
+  Image   Image[]
+  Service Service[]
+}
+
+model Booking {
+  id          String   @id @default(uuid())
+  date        DateTime
+  clientEmail String
+  client      Client   @relation(fields: [clientEmail], references: [userEmail])
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id])
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id])
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Agenda {
+  id           String     @id @default(uuid())
+  agenda       Json
+  unit         Int        @default(60)
+  startDate    DateTime
+  baseStore    Store?     @relation("baseAgenda")
+  displayStore Store?     @relation("displayAgenda")
+  Employee     Employee[]
+}
+
+model Employee {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  jobTitle  String
+  storeId   String
+  store     Store     @relation(fields: [storeId], references: [id])
+  agenda    Agenda    @relation(fields: [agendaId], references: [id])
+  agendaId  String
+  Booking   Booking[]
+}
+
+model Notification {
+  id         String                  @id @default(uuid())
+  type       NotificationTypes
+  target     NotificationTargetTypes
+  title      String
+  message    String
+  payload    Json
+  targetUser User?                   @relation(fields: [userEmail], references: [email])
+  userEmail  String?
+}
+
+model Boost {
+  //TODO: A revoir
+  id      String   @id @default(uuid())
+  storeId String
+  store   Store    @relation(fields: [storeId], references: [id])
+  start   DateTime
+  end     DateTime
+}
+
+model Pub {
+  //TODO: A revoir
+  id              String @id @default(uuid())
+  storeId         String
+  store           Store  @relation(fields: [storeId], references: [id])
+  mobileImage     Image  @relation("mobileImage", fields: [mobileImageUrl], references: [url])
+  desktopImage    Image  @relation("desktopImage", fields: [desktopImageUrl], references: [url])
+  mobileImageUrl  String @unique
+  desktopImageUrl String @unique
+}
+
+enum NotificationTypes {
+  BOOKING
+  SALE
+  INFO
+}
+
+enum NotificationTargetTypes {
+  GLOBAL
+  CLIENTS
+  STORES
+  USER
+}
+
+enum SubscriptionType {
+  BRONZE
+  SILVER
+  GOLD
 }
