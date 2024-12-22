@@ -112,12 +112,12 @@ model Service {
   description   String
   color         String
   stores        Store[]
-  //TODO: Add ImageCollection
   collectionId  String
   images        ImageCollection @relation(fields: [collectionId], references: [id])
   Bookmark      Bookmark[]
   subcategories SubCategory[]
   Booking       Booking[]
+  Boost         Boost[]
 }
 
 model Category {
@@ -196,16 +196,17 @@ model Notification {
 }
 
 model Boost {
-  //TODO: A revoir
   id      String   @id @default(uuid())
   storeId String
   store   Store    @relation(fields: [storeId], references: [id])
   start   DateTime
   end     DateTime
+
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
 }
 
 model Pub {
-  //TODO: A revoir
   id              String @id @default(uuid())
   storeId         String
   store           Store  @relation(fields: [storeId], references: [id])
