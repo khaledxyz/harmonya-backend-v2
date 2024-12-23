@@ -10,16 +10,16 @@ export const createSubscription = async (
 ): Promise<any> => {
   try {
     const {
-      ownerEmail,
+      ownerId,
       type,
     }: {
-      ownerEmail: string;
+      ownerId: string;
       type: SubscriptionType;
     } = req.body;
 
     const subscription = await prisma.subscription.create({
       data: {
-        ownerEmail,
+        ownerId,
         type,
         requestDate: new Date(),
       },
