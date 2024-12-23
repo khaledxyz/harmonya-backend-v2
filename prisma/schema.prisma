@@ -62,31 +62,32 @@ model Manager {
 }
 
 model Subscription {
-  id         String           @id @default(uuid())
-  type       SubscriptionType
-  start      DateTime
-  end        DateTime
-  paid       Boolean
-  price      Float
-  ownerEmail String
-  owner      Owner            @relation(fields: [ownerEmail], references: [userEmail])
+  id          String           @id @default(uuid())
+  type        SubscriptionType
+  requestDate DateTime
+  start       DateTime?
+  end         DateTime?
+  paid        Boolean          @default(false)
+  ownerEmail  String
+  owner       Owner            @relation(fields: [ownerEmail], references: [userEmail])
 }
 
 model Store {
-  id              String     @id @default(uuid())
-  name            String
-  address         String
-  ownerEmail      String
+  id         String @id @default(uuid())
+  name       String
+  address    String
+  ownerEmail String
+
   owner           Owner      @relation(fields: [ownerEmail], references: [userEmail])
   managerEmail    String
   manager         Manager    @relation(fields: [managerEmail], references: [userEmail])
-  Bookmark        Bookmark[]
-  services        Service[]
-  Booking         Booking[]
   displayAgendaId String     @unique
   displayAgenda   Agenda     @relation("displayAgenda", fields: [displayAgendaId], references: [id])
   baseAgendaId    String     @unique
   baseAgenda      Agenda     @relation("baseAgenda", fields: [baseAgendaId], references: [id])
+  Bookmark        Bookmark[]
+  services        Service[]
+  Booking         Booking[]
   Employee        Employee[]
   Boost           Boost[]
   Pub             Pub[]
