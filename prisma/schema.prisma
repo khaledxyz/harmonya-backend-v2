@@ -15,8 +15,8 @@ datasource db {
 
 // THIS IS JUST AN EXAMPLE!
 model User {
-  // id        Int      @id @default(autoincrement())
-  email     String  @id
+  id        String  @id @default(uuid())
+  email     String  @unique
   firstName String?
   lastName  String?
   //TODO: Add Profile Pic
@@ -30,13 +30,13 @@ model User {
 }
 
 model Admin {
-  userEmail String @id
-  user      User   @relation(fields: [userEmail], references: [email])
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model Client {
-  userEmail String     @id
-  user      User       @relation(fields: [userEmail], references: [email])
+  userId    String     @id
+  user      User       @relation(fields: [userId], references: [id])
   address   String
   phone     String
   birthdate DateTime
@@ -45,8 +45,8 @@ model Client {
 }
 
 model Owner {
-  userEmail    String         @id
-  user         User           @relation(fields: [userEmail], references: [email])
+  userId       String         @id
+  user         User           @relation(fields: [userId], references: [id])
   franchise    String         @unique
   Manager      Manager[]
   Subscription Subscription[]
@@ -54,11 +54,11 @@ model Owner {
 }
 
 model Manager {
-  userEmail  String  @id
-  user       User    @relation(fields: [userEmail], references: [email])
-  ownerEmail String
-  owner      Owner   @relation(fields: [ownerEmail], references: [userEmail])
-  Store      Store[]
+  userId  String  @id
+  user    User    @relation(fields: [userId], references: [id])
+  ownerId String
+  owner   Owner   @relation(fields: [ownerId], references: [userId])
+  Store   Store[]
 }
 
 model Subscription {
@@ -68,19 +68,19 @@ model Subscription {
   start       DateTime?
   end         DateTime?
   paid        Boolean          @default(false)
-  ownerEmail  String
-  owner       Owner            @relation(fields: [ownerEmail], references: [userEmail])
+  ownerId     String
+  owner       Owner            @relation(fields: [ownerId], references: [userId])
 }
 
 model Store {
-  id         String @id @default(uuid())
-  name       String
-  address    String
-  ownerEmail String
+  id      String @id @default(uuid())
+  name    String
+  address String
+  ownerId String
 
-  owner           Owner      @relation(fields: [ownerEmail], references: [userEmail])
-  managerEmail    String
-  manager         Manager    @relation(fields: [managerEmail], references: [userEmail])
+  owner           Owner      @relation(fields: [ownerId], references: [userId])
+  managerId       String
+  manager         Manager    @relation(fields: [managerId], references: [userId])
   displayAgendaId String     @unique
   displayAgenda   Agenda     @relation("displayAgenda", fields: [displayAgendaId], references: [id])
   baseAgendaId    String     @unique
@@ -94,15 +94,15 @@ model Store {
 }
 
 model Bookmark {
-  id          String   @id @default(uuid())
-  url         String
-  storeId     String?
-  store       Store?   @relation(fields: [storeId], references: [id])
-  createdAt   DateTime
-  serviceId   String?
-  service     Service? @relation(fields: [serviceId], references: [id])
-  clientEmail String
-  client      Client   @relation(fields: [clientEmail], references: [userEmail])
+  id        String   @id @default(uuid())
+  url       String
+  storeId   String?
+  store     Store?   @relation(fields: [storeId], references: [id])
+  createdAt DateTime
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id])
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [userId])
 }
 
 model Service {
@@ -132,7 +132,6 @@ model SubCategory {
   title      String
   categoryId String
   category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  serviceId  String?
   services   Service[]
 }
 
@@ -151,16 +150,16 @@ model ImageCollection {
 }
 
 model Booking {
-  id          String   @id @default(uuid())
-  date        DateTime
-  clientEmail String
-  client      Client   @relation(fields: [clientEmail], references: [userEmail])
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id])
-  serviceId   String
-  service     Service  @relation(fields: [serviceId], references: [id])
-  employeeId  String
-  employee    Employee @relation(fields: [employeeId], references: [id])
+  id         String   @id @default(uuid())
+  date       DateTime
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [userId])
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id])
+  serviceId  String
+  service    Service  @relation(fields: [serviceId], references: [id])
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
 }
 
 model Agenda {
@@ -192,8 +191,8 @@ model Notification {
   title      String
   message    String
   payload    Json
-  targetUser User?                   @relation(fields: [userEmail], references: [email])
-  userEmail  String?
+  targetUser User?                   @relation(fields: [userId], references: [id])
+  userId     String?
 }
 
 model Boost {
