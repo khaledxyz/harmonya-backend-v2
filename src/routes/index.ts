@@ -1,6 +1,25 @@
 import { Router, Request, Response } from "express";
+
 import { categoriesRouter } from "./categories.router";
+
+import {
+  deleteFromCloudinaryController,
+  dynamicImageUpload,
+} from "../middlewares/imageUpload.middleware";
+import { RequestWithImages } from "../types";
+
 const router = Router();
+
+router.post(
+  "/upload",
+  dynamicImageUpload,
+  (req: RequestWithImages, res: Response) => {
+    console.log("images: ", req.images);
+    res.send(req.images);
+  }
+);
+
+router.delete("/upload", deleteFromCloudinaryController);
 
 /**
  * @swagger
