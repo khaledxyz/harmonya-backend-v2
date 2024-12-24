@@ -6,7 +6,7 @@ import {
   getSubscriptionById,
   updateSubscription,
   validateSubscription,
-} from "../controllers/Subscription";
+} from "../controllers/subscription.controller";
 
 const router = Router();
 
