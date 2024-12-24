@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { categoriesRouter } from "./categories.router";
 const router = Router();
 
 /**
@@ -11,7 +12,7 @@ const router = Router();
  *         description: Hello World message
  */
 router.get("/", (_: Request, res: Response) => {
-    res.send("Hello, World!");
+  res.send("Hello, World!");
 });
 
 /**
@@ -32,7 +33,7 @@ router.get("/", (_: Request, res: Response) => {
  *                   example: healthy
  */
 router.get("/health", (_: Request, res: Response) => {
-    res.json({ status: "healthy" });
+  res.json({ status: "healthy" });
 });
 
 /**
@@ -52,8 +53,10 @@ router.get("/health", (_: Request, res: Response) => {
  *                   type: string
  *                   example: "English"
  */
-router.get('/current-language', (req: Request, res: Response) => {
-    res.json({ language: req.t('debug:currentLangue') });
+router.get("/current-language", (req: Request, res: Response) => {
+  res.json({ language: req.t("debug:currentLangue") });
 });
+
+router.use("/category", categoriesRouter);
 
 export { router };
