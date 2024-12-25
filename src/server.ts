@@ -5,12 +5,14 @@ import { morganMiddleware } from "./middlewares/morgan.middleware";
 import { i18n } from "./middlewares/i18n.middleware";
 import { router } from "./routes";
 import { setupSwagger } from "./utils/swagger";
+import { rateLimiter } from "./middlewares/rate-limiter.middleware";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 const app = express();
 
 // Middlewares setup
 app.use(express.json());
+app.use(rateLimiter());
 app.use(morganMiddleware);
 app.use(i18n);
 
