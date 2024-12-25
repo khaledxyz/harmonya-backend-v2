@@ -1,9 +1,13 @@
 import { Router, Request, Response } from "express";
+
+import { categoriesRouter } from "./categories.router";
+
 import {
   deleteFromCloudinaryController,
   dynamicImageUpload,
 } from "../middlewares/imageUpload.middleware";
 import { RequestWithImages } from "../types";
+
 const router = Router();
 
 router.post(
@@ -71,5 +75,7 @@ router.get("/health", (_: Request, res: Response) => {
 router.get("/current-language", (req: Request, res: Response) => {
   res.json({ language: req.t("debug:currentLangue") });
 });
+
+router.use("/category", categoriesRouter);
 
 export { router };
