@@ -56,4 +56,4 @@ router.get('/current-language', (req: Request, res: Response) => {
     res.json({ language: req.t('debug:currentLangue') });
 });
 
-export { router };
+export { router as appRouter };

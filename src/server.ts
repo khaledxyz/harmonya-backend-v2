@@ -1,16 +1,23 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import helmet from 'helmet';
 import dotenv from "dotenv";
 import chalk from "chalk";
+import passport from 'passport';
 import { morganMiddleware } from "./middlewares/morgan.middleware";
 import { i18n } from "./middlewares/i18n.middleware";
-import { router } from "./routes";
 import { setupSwagger } from "./utils/swagger";
+
+import { appRouter } from "./routes";
+import { authRouter } from "./routes/auth.router";
+import { usersRouter } from "./routes/users.router";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 const app = express();
 
 // Middlewares setup
+app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morganMiddleware);
 app.use(i18n);
 
@@ -18,7 +25,9 @@ app.use(i18n);
 setupSwagger(app);
 
 // Register routes
-app.use("/", router);
+app.use("/", appRouter);
+app.use('/auth', authRouter)
+app.use('/users', usersRouter)
 
 // Server configuration
 const PORT = process.env.PORT || 3000;
@@ -32,7 +41,7 @@ const server = app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-const shutdown = () => {
+const shutdown = async () => {
   console.log(chalk.yellow("\nShutting down gracefully..."));
   server.close(() => {
     console.log(chalk.green("Server closed. Goodbye!"));
