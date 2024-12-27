@@ -6,6 +6,7 @@ import passport from 'passport';
 import { morganMiddleware } from "./middlewares/morgan.middleware";
 import { i18n } from "./middlewares/i18n.middleware";
 import { setupSwagger } from "./utils/swagger";
+import { rateLimiter } from "./middlewares/rate-limiter.middleware";
 
 import { appRouter } from "./routes";
 import { authRouter } from "./routes/auth.router";
@@ -18,6 +19,7 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter());
 app.use(morganMiddleware);
 app.use(i18n);
 
